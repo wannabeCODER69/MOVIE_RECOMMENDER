@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movie Recommender</title>
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+
+    select, button {
+      font-size: 1rem;
+      padding: 10px 15px;
+      margin: 10px;
+      border-radius: 5px;
+      border: none;
+    }
+
+    button {
+      background: #03dac5;
+      color: black;
+      cursor: pointer;
+    }
+
+    #movie {
+      margin-top: 30px;
+      font-size: 1.1rem;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #movie img {
+      width: 200px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎥 Genre-Based Movie Recommender</h1>
+
+  <label for="genreSelect">Choose a Genre:</label>
+  <select id="genreSelect">
+    <option value="28">Action</option>
+    <option value="35">Comedy</option>
+    <option value="18">Drama</option>
+    <option value="27">Horror</option>
+    <option value="10749">Romance</option>
+    <option value="16">Animation</option>
+    <option value="878">Science Fiction</option>
+    <option value="53">Thriller</option>
+    <option value="12">Adventure</option>
+    <option value="80">Crime</option>
+  </select>
+
+  <br />
+  <button onclick="recommendMovie()">Recommend Movie</button>
+
+  <div id="movie">Click the button to get a recommendation!</div>
+
+  <script>
+    const apiKey = "7e7853f3586e9c245382e9bcac61dfdd"; // Replace with your TMDB API key
+
+    async function recommendMovie() {
+      const genreId = document.getElementById("genreSelect").value;
+      const randomPage = Math.floor(Math.random() * 20) + 1;
+      const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}&language=en-US&page=${randomPage}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const movies = data.results;
+
+        if (!movies.length) {
+          document.getElementById('movie').innerText = "No movies found for that genre.";
+          return;
+        }
+
+        const movie = movies[Math.floor(Math.random() * movies.length)];
+
+        const posterUrl = movie.poster_path
+          ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+          : 'https://via.placeholder.com/200x300?text=No+Image';
+
+        document.getElementById('movie').innerHTML = `
+          <strong>🎬 ${movie.title}</strong><br>
+          ⭐ Rating: ${movie.vote_average}<br>
+          📅 Release Date: ${movie.release_date}<br>
+          📝 Overview: ${movie.overview}<br>
+          <img src="${posterUrl}" alt="Movie Poster">
+        `;
+      } catch (err) {
+        console.error(err);
+        document.getElementById('movie').innerText = "Failed to fetch movie. Try again.";
+      }
+    }
+  </script>
+</body>
+</html>
